@@ -1,46 +1,28 @@
 package name.kalabaha.droplogger;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.android.AndroidAuthSession;
-import com.dropbox.client2.session.AppKeyPair;
-
 public class MainActivity extends ActionBarActivity {
 
-    final static private String APP_KEY = "myii2xbmnyj27o3";
-    final static private String APP_SECRET = "qcds61m551uqzvy";
-
-    private DropboxAPI<AndroidAuthSession> mDBApi;
+    DropLogger dropLogger;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        AppKeyPair appKeys = new AppKeyPair(APP_KEY, APP_SECRET);
-        AndroidAuthSession session = new AndroidAuthSession(appKeys);
-        mDBApi = new DropboxAPI<>(session);
-
-        mDBApi.getSession().startOAuth2Authentication(MainActivity.this);
+        dropLogger = new DropLogger(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        if (mDBApi.getSession().authenticationSuccessful()) {
-            try {
-                mDBApi.getSession().finishAuthentication();
-
-                String accessToken = mDBApi.getSession().getOAuth2AccessToken();
-            } catch (IllegalStateException e) {
-                Log.i("DbAuthLog", "Error authenticating", e);
-            }
+        if (dropLogger != null) {
+            dropLogger.onActivityResume();
         }
     }
 
