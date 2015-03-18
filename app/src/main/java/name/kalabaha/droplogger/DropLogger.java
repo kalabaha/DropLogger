@@ -2,12 +2,17 @@ package name.kalabaha.droplogger;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
+import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.AppKeyPair;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 public class DropLogger {
 
@@ -54,5 +59,21 @@ public class DropLogger {
         } else {
             Toast.makeText(mContext, "Fail", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void storeTimestamp() {
+        AsyncTask<byte[], Void, Void> putFileTask = new AsyncTask<byte[], Void, Void>() {
+            @Override
+            protected Void doInBackground(byte[]... params) {
+                try {
+                    InputStream inputStream = new ByteArrayInputStream(params[0]);
+                    mDBApi.putFile("ts.bin", inputStream, params[0].length, null, null);
+                } catch (DropboxException e) {
+                    Log.e("DbExampleLog", "putFile failed", e);
+                }
+                return null;
+            }
+        };
+        putFileTask.execute(new byte[] {'a', 'b', 'c', 'd'});
     }
 }
